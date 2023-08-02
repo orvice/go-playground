@@ -1,2 +1,6 @@
+github.com/samber/lo v1.38.1 h1:j2XEAqXKb09Am4ebOg31SpvzUTTs6EN3VfgeLUhPdXM=
+github.com/samber/lo v1.38.1/go.mod h1:+m/ZKRl6ClXCE2Lgf3MsQlWfh4bn1bz6CXEOxnEXnEA=
+github.com/samber/slog-webhook v0.2.0 h1:Y9P5+plqgj3GmKoh1E6ZX77l7VNxgXYFkqr/rSSBjTQ=
+github.com/samber/slog-webhook v0.2.0/go.mod h1:JK+WiinrwlwyrQao4ZrW+zigOeaV6pgj+BwT/aLhzbE=
 golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b h1:r+vk0EmXNmekl0S0BascoeeoHk/L7wmaW2QF90K+kYI=
 golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b/go.mod h1:FXUEEKJgO7OQYeo8N01OfiKP8RXMtf6e8aTskBGqWdc=

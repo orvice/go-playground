@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 
+	slogwebhhok "github.com/samber/slog-webhook"
 	"golang.org/x/exp/slog"
 )
 
@@ -16,13 +17,22 @@ func setHandler() {
 	slog.SetDefault(newLogger())
 }
 
+func webhookLogger() *slog.Logger {
+	url := os.Getenv("SLOG_ENDPOINT")
+
+	logger := slog.New(slogwebhhok.Option{Level: slog.LevelDebug, Endpoint: url}.NewWebhookHandler())
+	logger = logger.With("release", "v1.0.0")
+	return logger
+}
+
 func newLogger() *slog.Logger {
 	jsonHandler := slog.NewJSONHandler(newHttpWriter(), &slog.HandlerOptions{
 		AddSource: false,
 	})
-	var handler = jsonHandler.WithGroup("top_level_group").WithAttrs([]slog.Attr{
+	var handler = jsonHandler.WithAttrs([]slog.Attr{
 		slog.String("sub_type", "sub_type_value"),
-	})
+		slog.String("system", "optimus"),
+	}).WithGroup("message")
 	return slog.New(handler)
 }
 
@@ -38,6 +48,16 @@ func main() {
 	logger.LogAttrs(ctx, slog.LevelError, "oops", slog.Int("status", http.StatusAccepted))
 	logger.LogAttrs(ctx, slog.LevelInfo, "", slog.Group("group", "key", "value"))
 	logger.Info("Usage Statistics",
+		slog.Group("memory",
+			slog.Int("current", 50),
+			slog.Int("min", 20),
+			slog.Int("max", 80)),
+		slog.Int("cpu", 10),
+		slog.String("version", "v0.0.1"),
+	)
+
+	webhookLogger := webhookLogger()
+	webhookLogger.Info("Usage Statistics",
 		slog.Group("memory",
 			slog.Int("current", 50),
 			slog.Int("min", 20),
