@@ -17,9 +17,13 @@ func setHandler() {
 }
 
 func newLogger() *slog.Logger {
-	return slog.New(slog.NewJSONHandler(newHttpWriter(), &slog.HandlerOptions{
+	jsonHandler := slog.NewJSONHandler(newHttpWriter(), &slog.HandlerOptions{
 		AddSource: false,
-	}))
+	})
+	var handler = jsonHandler.WithGroup("top_level_group").WithAttrs([]slog.Attr{
+		slog.String("sub_type", "sub_type_value"),
+	})
+	return slog.New(handler)
 }
 
 func main() {
@@ -33,7 +37,14 @@ func main() {
 	logger := newLogger()
 	logger.LogAttrs(ctx, slog.LevelError, "oops", slog.Int("status", http.StatusAccepted))
 	logger.LogAttrs(ctx, slog.LevelInfo, "", slog.Group("group", "key", "value"))
-
+	logger.Info("Usage Statistics",
+		slog.Group("memory",
+			slog.Int("current", 50),
+			slog.Int("min", 20),
+			slog.Int("max", 80)),
+		slog.Int("cpu", 10),
+		slog.String("version", "v0.0.1"),
+	)
 }
 
 func newHttpWriter() io.Writer {
