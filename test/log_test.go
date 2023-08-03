@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"io"
 	"os"
 	"testing"
 
@@ -10,7 +11,7 @@ import (
 )
 
 func setup() {
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	slog.SetDefault(slog.New(slog.NewJSONHandler(io.Discard, nil)))
 }
 
 func TestMain(m *testing.M) {
