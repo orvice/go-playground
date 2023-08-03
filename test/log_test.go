@@ -2,10 +2,21 @@ package test
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"golang.org/x/exp/slog"
 )
+
+func setup() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+}
+
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	os.Exit(code)
+}
 
 func BenchmarkSlogKV(b *testing.B) {
 	for i := 0; i < b.N; i++ {
