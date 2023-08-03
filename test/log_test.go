@@ -33,6 +33,16 @@ func BenchmarkSlogAttr(b *testing.B) {
 	}
 }
 
+func BenchmarkZapStruct(b *testing.B) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	for i := 0; i < b.N; i++ {
+		logger.Info("hello", zap.String("name", "Al"))
+	}
+
+}
+
 func BenchmarkZap(b *testing.B) {
 	logger, _ := zap.NewProduction()
 	defer logger.Sync() // flushes buffer, if any
