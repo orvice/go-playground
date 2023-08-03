@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"golang.org/x/exp/slog"
 )
 
@@ -33,10 +34,31 @@ func BenchmarkSlogAttr(b *testing.B) {
 	}
 }
 
-func BenchmarkZapStruct(b *testing.B) {
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+type discardWriteSyncer struct{}
 
+func (discardWriteSyncer) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+func (discardWriteSyncer) Sync() error {
+	return nil
+}
+
+func newZapCore() zapcore.Core {
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(zapcore.EncoderConfig{}), discardWriteSyncer{}, zap.DebugLevel)
+	return core
+}
+
+func newZapLogger() *zap.Logger {
+	logger, _ := zap.NewProduction(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return newZapCore()
+	}))
+	return logger
+}
+
+func BenchmarkZapStruct(b *testing.B) {
+	logger := newZapLogger()
+	defer logger.Sync()
 	for i := 0; i < b.N; i++ {
 		logger.Info("hello", zap.String("name", "Al"))
 	}
@@ -44,7 +66,7 @@ func BenchmarkZapStruct(b *testing.B) {
 }
 
 func BenchmarkZap(b *testing.B) {
-	logger, _ := zap.NewProduction()
+	logger := newZapLogger()
 	defer logger.Sync() // flushes buffer, if any
 	sugar := logger.Sugar()
 
